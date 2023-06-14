@@ -73,10 +73,10 @@
         margin: 20px;
         margin-top: 40px;
         width: 90%;
-        min-height: 300px;
+        /* min-height: 300px; */
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: start;
         flex-direction: column;
     }
     .title {
@@ -85,7 +85,7 @@
         width: 100%;
         font-weight: 900;
         text-align: start;
-        text-wrap: balance;
+        /* text-wrap: balance; */
     }
     .title2 {
         color: #DFD5EC;
@@ -102,34 +102,56 @@
     }
     .infos {
         margin: 20px;
-        width: 90%;
+        width: 1150px;
         min-height: 200px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: row;
     }
-    .infos:has(.info:hover) > .info:not(:hover) {
-        filter: blur(4px) brightness(50%);
-        user-select: none;
+    @media (max-width: 1150px) {
+        .infos {
+            flex-wrap: wrap;
+            width: 570px;
+        }
+        .feed {
+            width: 700px;
+        }
+        .feed > .title {
+            font-size: 30px;
+        }
     }
+    @media (max-width: 770px) {
+        .infos {
+            flex-wrap: wrap;
+            width: 280px;
+        }
+        .feed {
+            width: 90%;
+        }
+        .feed > .title {
+            font-size: 20px;
+        }
+    }
+    /* .infos:has(.info:hover) > .info:not(:hover) {
+        opacity: 20%;
+        user-select: none;
+    } */
     .info {
         width: 220px;
         height: 150px;
         margin: 10px;
-        background-color: #1D1B20;;
+        background-color: #1D1B20;
         border: 4px solid #DFD5EC;
         border-radius: 20px;
         padding: 15px;
         position: relative;
-        transition: 200ms;
+        /* transition: 200ms; */
     }
-    .info:hover {
+    /* .info:hover {
         transform: scale(120%, 120%);
         z-index: 4;
-        /* margin-left: 25px;
-        margin-right: 25px; */
-    }
+    } */
     .infoT {
         width: 220px;
         height: 110px;
@@ -171,8 +193,8 @@
     }
     .goto > svg {
         border-radius: 50%;
-        background-color: rgba(0, 0, 0, 0.5);
-        box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 5px 3px;
+        background-color: #1d1b207c;
+        box-shadow: #1d1b207c 0px 0px 5px 3px;
         transition: 200ms;
     }
     .goto:hover > svg {

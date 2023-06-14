@@ -20,5 +20,6 @@
         position: fixed;
         width: 100vw;
         height: 80px;
+        z-index: 500;
     }
 </style>
