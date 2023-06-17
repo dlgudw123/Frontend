@@ -1,21 +1,48 @@
 <script lang="ts">
-    // import { onMount } from "svelte";
+    import { onMount } from "svelte";
 
-    // onMount(() => {
-    //     const idxedDB = window.indexedDB;
-    //     if (!idxedDB) window.alert('해당 브라우저에서는 indexedDB를 지원하지 않습니다.')
-    //     else {
-    //         let db;
-    //         const request = idxedDB.open('SampleDB');
-    //         request.onerror = (e) => alert('failed');
-    //         request.onsuccess = (e) => db = request.result;
-    //         request.onupgradeneeded = (e) => {                
-    //             db = e.target.result;
-    //             let objectStore = db.createObjectStore("memo", { keyPath: "id" });
-    //             objectStore.createIndex("name", "name", { unique: false });
-    //         }
-    //     }
-    // })
+    let writeIdxedDB = (names:JSON[]) => {};
+
+    onMount(() => {
+        const idxedDB = window.indexedDB;
+        if (!idxedDB) window.alert('해당 브라우저에서는 indexedDB를 지원하지 않습니다.')
+        else {
+            let db;
+            const request = idxedDB.open('SampleDB');
+            request.onerror = (e) => alert('failed');
+            request.onsuccess = (e) => db = request.result;
+            request.onupgradeneeded = (e) => {                
+                db = e.target.result;
+                let objectStore = db.createObjectStore("name", { keyPath: "id" });
+                writeIdxedDB = (names) => {
+                    request.onerror =(e)=> {
+                        alert('DataBase error', e.target.errorCode);
+                    }
+                    request.onsuccess =(e)=> {
+                        const db = request.result;
+                        const transaction = db.transaction(['name'], 'readwrite');  
+                        //person 객체 저장소에 읽기&쓰기 권한으로 transaction 생성
+        
+                        // 완료, 실패 이벤트 처리
+                        transaction.oncomplete =(e)=> {
+                            console.log('success');
+                        }
+                        transaction.onerror =(e)=> {
+                            console.log('fail');
+                        }
+        
+                        // transaction으로 
+                        const objStore = transaction.objectStore('name');
+                        for (const name of names) {
+                            const request = objStore.add(name);   // 저장
+                            request.onsuccess =(e)=> console.log(e.target.result);
+                        }  
+                    }
+                }
+                writeIdxedDB([{id: 1, name: 'a'}, {id: 2, name: 'b'}, {id: 3, name: 'c'}]);
+            }
+        }
+    })
 </script>
 
 <main>
