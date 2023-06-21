@@ -27,7 +27,7 @@
         <div class="info">
             <div class="title2 botm">추천 운동</div>
             <div class="text1 infoT">Seated Head Harness Neck Resistance</div>
-            <a href="/" class="goto">
+            <a href="/exercise" class="goto">
                 <svg width="30" height="30" viewBox="0 0 25 24" fill="none">
                     <path d="M12.625 20L11.2 18.6L16.8 13H4.625V11H16.8L11.2 5.4L12.625 4L20.625 12L12.625 20Z" fill="#DFD5EC"/>
                 </svg>                    
@@ -36,7 +36,7 @@
         <div class="info">
             <div class="title2 botm">추천 음식</div>
             <div class="text1 infoT">Bruschetta Style Pork & Pasta</div>
-            <a href="/" class="goto">
+            <a href="/food" class="goto">
                 <svg width="30" height="30" viewBox="0 0 25 24" fill="none">
                     <path d="M12.625 20L11.2 18.6L16.8 13H4.625V11H16.8L11.2 5.4L12.625 4L20.625 12L12.625 20Z" fill="#DFD5EC"/>
                 </svg>                    
@@ -45,7 +45,7 @@
         <div class="info">
             <div class="title2 botm">현재 상태</div>
             <div class="text1 infoT">거북목이 우려됨.</div>
-            <a href="/" class="goto">
+            <a href="/info" class="goto">
                 <svg width="30" height="30" viewBox="0 0 25 24" fill="none">
                     <path d="M12.625 20L11.2 18.6L16.8 13H4.625V11H16.8L11.2 5.4L12.625 4L20.625 12L12.625 20Z" fill="#DFD5EC"/>
                 </svg>                    
