@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     
+    let load = false;
     let sidebar = false;
     
     let writeIdxedDB = (names:any[]) => {console.log('추가 로딩 안됨')};
@@ -13,9 +14,12 @@
     const add = (things:any[]) => {writeIdxedDB(things)};
     const del = (key:number) => {deleteIdxedDBValue(key)};
     const clear = () => {clearIdxedDBValue()};
-    const find = (key:number) => {getIdxedDBValue(key)};
+    const find = (key:number) => getIdxedDBValue(key);
     const first = () => getIdxedDBFirstValue();
     const getLength = () => getIdxedDBLength();
+
+    let lists:{id:number, name:string}[] = [];
+    let can = true;
 
     const DBName = "list";
 
@@ -151,11 +155,33 @@
                 objStoreRequest.onerror = rej;
             }).then(val => objStoreRequest.result)
             .catch(err => {throw err});
-            return res;}
+            return res;
+        }
+        if (!lists.length) {
+            const fir = await first();
+            const leng = await getLength();
+            const last = fir.id + leng - 1;
+            for (let i = last; i > Math.max(last - 10, fir.id - 1); i--) {
+                let now = await find(i);
+                lists = [...lists, now];
+            }
+            can = !(last - 10 <= fir.id - 1);
+        }
+        load = true;
     });
+
+    const more = async () => {
+        const fir = await first();
+        const last = lists[lists.length - 1].id;
+        for (let i = last - 1; i > Math.max(last - 11, fir.id - 1); i--) {
+            let now = await find(i);
+            lists = [...lists, now];
+        }
+        can = !(last - 11 <= fir.id - 1);
+    }
 </script>
 
-<main class="bc2">
+<main class="bc2" style="{(load)? '':'display: none;'}">
     <header class="bc3">
         <button class="pan" on:click={() => {sidebar = true}}>
             <svg width="50" height="50" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -188,12 +214,17 @@
             </button>
         </div>
         <div class="lists">
-            {#each Array(30).fill('b') as v, i}
+            {#each lists as {id, name}, i}
             <div class="list">
-                <div class="listTitle">{i + 1}번째</div>
+                <div class="listTitle">{i + 1}. {id}번째 {name}</div>
                 <div class="listTime">0월 0일 0:00</div>
             </div>
             {/each}
+            {#if can}
+            <div class="graph" style="position: static;" on:click={more}>
+                <div class="graphText">더보기</div>
+            </div>
+            {/if}
             <a class="graph" href="/graph">
                 <div class="graphText">눈 깜빡임 그래프 보기</div>
             </a>
@@ -252,7 +283,7 @@
         cursor: pointer;
     }
     .side {
-        position: absolute;
+        position: fixed;
         width: 350px;
         height: 100vh;
         background-color: #1D1B20;
@@ -349,6 +380,10 @@
         user-select: none;
         color: #E6E0E9;
         text-decoration: none;
+        justify-content: center;
+    }
+    .graph:hover {
+        cursor: pointer;
     }
     .graphText {
         font-weight: 400;
