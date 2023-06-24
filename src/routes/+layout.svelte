@@ -41,9 +41,9 @@
                 <div class="listTime">0월 0일 0:00</div>
             </div>
             {/each}
-            <div class="graph">
+            <a class="graph" href="/graph">
                 <div class="graphText">눈 깜빡임 그래프 보기</div>
-            </div>
+            </a>
         </div>
     </div>
     <slot></slot>
@@ -195,13 +195,15 @@
         background-color: #1D1B20;
         user-select: none;
         color: #E6E0E9;
-    }
-    .graph:hover {
-        cursor: pointer;
+        text-decoration: none;
     }
     .graphText {
         font-weight: 400;
         font-size: 19px;
         margin: 20px;
+    }
+    *::selection {
+        background-color: #D0BCFF;
+        color: #381E72;
     }
 </style>

@@ -39,7 +39,7 @@
                         }  
                     }
                 }
-                writeIdxedDB([{id: 1, name: 'a'}, {id: 2, name: 'b'}, {id: 3, name: 'c'}]);
+                writeIdxedDB([{id: 1, name: "a"}, {id: 2, name: "b"}, {id: 3, name: "c"}]);
             }
         }
     })
@@ -231,5 +231,12 @@
     }
     .goto:hover {
         background-color: rgba(208, 188, 255, 0.12);
+    }
+    svg {
+        pointer-events: none;
+    }
+    *::selection {
+        background-color: #D0BCFF;
+        color: #381E72;
     }
 </style>
