@@ -1,5 +1,158 @@
-<script>
+<script lang="ts">
+    import { onMount } from "svelte";
+    
     let sidebar = false;
+    
+    let writeIdxedDB = (names:any[]) => {console.log('추가 로딩 안됨')};
+    let deleteIdxedDBValue = (key:number) => {console.log('삭제 로딩 안됨')};
+    let clearIdxedDBValue = () => {console.log('초기화 로딩 안됨')};
+    let getIdxedDBValue = async (key:number) => {console.log('초기화 로딩 안됨')};
+    let getIdxedDBFirstValue = async () => {console.log('첫번째 로딩 안됨')};
+    let getIdxedDBLength = async () => {console.log('길이 로딩 안됨');return 0};
+
+    const add = (things:any[]) => {writeIdxedDB(things)};
+    const del = (key:number) => {deleteIdxedDBValue(key)};
+    const clear = () => {clearIdxedDBValue()};
+    const find = (key:number) => {getIdxedDBValue(key)};
+    const first = () => getIdxedDBFirstValue();
+    const getLength = () => getIdxedDBLength();
+
+    const DBName = "list";
+
+    onMount(async () => {
+        const idxedDB = window.indexedDB;
+        if (!idxedDB) window.alert('해당 브라우저에서는 indexedDB를 지원하지 않습니다.')
+        else {
+            let db;
+            const request = idxedDB.open('SampleDB');
+            request.onerror = (e) => alert('failed');
+            request.onsuccess = (e) => db = e.target.result;
+            request.onupgradeneeded = (e) => {                
+                db = e.target.result;
+                let objectStore = db.createObjectStore(DBName, { keyPath: "id" });
+            }}
+        writeIdxedDB = (names:any[]) => {
+            const request = window.indexedDB.open('SampleDB');
+            request.onsuccess =(e)=> {
+                const db = request.result;
+                const transaction = db.transaction([DBName], 'readwrite');  
+                //person 객체 저장소에 읽기&쓰기 권한으로 transaction 생성
+    
+                // 완료, 실패 이벤트 처리
+                transaction.oncomplete =(e)=> {
+                    console.log('추가 성공');
+                }
+                transaction.onerror =(e)=> {
+                    if(!(e.target instanceof IDBRequest)) return;
+                    console.log('추가 실패', e.target.error);
+                };
+    
+                // transaction으로 
+                const objStore = transaction.objectStore(DBName);
+                for (const name of names) {
+                    const request = objStore.add(name);   // 저장
+                }  
+            }}
+        deleteIdxedDBValue = (key:number) => {
+            const request = window.indexedDB.open('SampleDB');     // 1. db 열기
+
+            request.onsuccess =(e)=> {
+                const db = request.result;
+                const transaction = db.transaction(DBName, 'readwrite');
+                transaction.onerror =(e)=> {
+                    if(!(e.target instanceof IDBRequest)) return;
+                    console.log('삭제 실패', e.target.error);
+                };
+                transaction.oncomplete =(e)=> console.log('삭제 성공');
+
+                const objStore = transaction.objectStore(DBName);   // 2. name 저장소 접근
+                const objStoreRequest = objStore.delete(key);       // 3. 삭제하기
+            }}
+        clearIdxedDBValue = () => {
+            const request = window.indexedDB.open('SampleDB');     // 1. db 열기
+
+            request.onsuccess =(e)=> {
+                const db = request.result;
+                const transaction = db.transaction(DBName, 'readwrite');
+                transaction.onerror =(e)=> {
+                    if(!(e.target instanceof IDBRequest)) return;
+                    console.log('초기화실패', e.target.error);
+                };
+                transaction.oncomplete =(e)=> console.log('초기화성공');
+
+                const objStore = transaction.objectStore(DBName);   // 2. name 저장소 접근
+                const objStoreRequest = objStore.clear();           // 3. 전체 삭제
+                objStoreRequest.onsuccess =(e)=> {
+                    console.log('초기화됨.');
+                }
+            }}
+        getIdxedDBValue = async (key:number) => {
+            const request = window.indexedDB.open('SampleDB');  // 1. DB 열기
+            const e = await new Promise<Event>((res, rej) => {
+                request.onsuccess = res;
+                request.onerror = rej;
+            });
+            const db = request.result;
+            const transaction = db.transaction(DBName);
+            transaction.onerror =(e)=> {
+                if(!(e.target instanceof IDBRequest)) return;
+                console.log('조회실패', e.target.error);
+            };
+            transaction.oncomplete =(e)=> console.log('조회성공');
+
+            const objStore = transaction.objectStore(DBName);
+            const objStoreRequest = objStore.get(key);        // 2. get으로 데이터 접근
+            const res = await new Promise((res, rej) => {
+                objStoreRequest.onsuccess = res;
+                objStoreRequest.onerror = rej;
+            }).then(val => objStoreRequest.result)
+            .catch(err => {throw err});
+            return res;}
+        getIdxedDBFirstValue = async () => {
+            const request = window.indexedDB.open('SampleDB');      // 1. DB 열기
+            const e = await new Promise<Event>((res, rej) => {
+                request.onsuccess = res;
+                request.onerror = rej;
+            });
+            const db = request.result;
+            const transaction = db.transaction(DBName);
+            transaction.onerror =(e)=> {
+                if(!(e.target instanceof IDBRequest)) return;
+                console.log('첫번째 조회 실패', e.target.error);
+            };
+            transaction.oncomplete =(e)=> console.log('첫번째 조회 성공');
+
+            const objStore = transaction.objectStore(DBName);    // 2. name 저장소 접근
+            const cursorRequest = objStore.openCursor();
+            const res = await new Promise((res, rej) => {
+                cursorRequest.onsuccess = res;
+                cursorRequest.onerror = rej;
+            }).then(val => cursorRequest.result)
+            .catch(err => {throw err});
+            return res?.value;}
+        getIdxedDBLength = async () => {
+            const request = window.indexedDB.open('SampleDB');  // 1. DB 열기
+            const e = await new Promise<Event>((res, rej) => {
+                request.onsuccess = res;
+                request.onerror = rej;
+            });
+            const db = request.result;
+            const transaction = db.transaction(DBName);
+            transaction.onerror =(e)=> {
+                if(!(e.target instanceof IDBRequest)) return;
+                console.log('길이 조회 실패', e.target.error);
+            };
+            transaction.oncomplete =(e)=> console.log('길이 조회 성공');
+
+            const objStore = transaction.objectStore(DBName);
+            const objStoreRequest = objStore.count();
+            const res = await new Promise((res, rej) => {
+                objStoreRequest.onsuccess = res;
+                objStoreRequest.onerror = rej;
+            }).then(val => objStoreRequest.result)
+            .catch(err => {throw err});
+            return res;}
+    });
 </script>
 
 <main class="bc2">
