@@ -157,9 +157,10 @@
             .catch(err => {throw err});
             return res;
         }
-        if (!lists.length) {
+        const leng = await getLength();
+        console.log(leng);
+        if (!lists.length && leng) {
             const fir = await first();
-            const leng = await getLength();
             const last = fir.id + leng - 1;
             for (let i = last; i > Math.max(last - 10, fir.id - 1); i--) {
                 let now = await find(i);
@@ -195,7 +196,7 @@
             </defs>
             </svg>
         </button>
-        <h1>모션인식 건강관리 프로그램</h1>
+        <h1 on:click={async () => {add([{id: await getLength(), name: 'dsfasdf'}])}}>모션인식 건강관리 프로그램 (클릭하면 값추가)</h1>
     </header>
     <div class="side {sidebar? 'on':''}">
         <div class="up">
@@ -217,17 +218,21 @@
             {#each lists as {id, name}, i}
             <div class="list">
                 <div class="listTitle">{i + 1}. {id}번째 {name}</div>
-                <div class="listTime">0월 0일 0:00</div>
+                <!-- <div class="listTime">0월 0일 0:00</div> -->
+                <div class="listTime">{new Date(Date.now()).toISOString()}</div>
             </div>
             {/each}
-            {#if can}
+            {#if can && lists.length}
             <div class="graph" style="position: static;" on:click={more}>
                 <div class="graphText">더보기</div>
             </div>
+            {:else if !lists.length}
+            <div class="nothing">기록이 없습니다</div>
             {/if}
             <a class="graph" href="/graph">
                 <div class="graphText">눈 깜빡임 그래프 보기</div>
             </a>
+            <div class="dark"></div>
         </div>
     </div>
     <slot></slot>
@@ -381,6 +386,7 @@
         color: #E6E0E9;
         text-decoration: none;
         justify-content: center;
+        z-index: 2;
     }
     .graph:hover {
         cursor: pointer;
@@ -393,5 +399,23 @@
     *::selection {
         background-color: #D0BCFF;
         color: #381E72;
+    }
+    .nothing {
+        color: #E6E0E9;
+        font-size: 18px;
+        text-align: center;
+        margin: 20px;
+        font-weight: 500;
+    }
+    .dark {
+        position: absolute;
+        width: 100px;
+        height: 150px;
+        background-color: black;
+        bottom: 0px;
+        width: calc(100% - 10px);
+        z-index: 1;
+        background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(0,0,0,1) 100%);
+        pointer-events: none;
     }
 </style>
