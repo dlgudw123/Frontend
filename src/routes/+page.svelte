@@ -192,8 +192,4 @@
     svg {
         pointer-events: none;
     }
-    *::selection {
-        background-color: #D0BCFF;
-        color: #381E72;
-    }
 </style>

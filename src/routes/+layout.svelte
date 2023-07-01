@@ -4,9 +4,9 @@
     let load = false;
     let sidebar = false;
     
-    let writeIdxedDB = (names:any[]) => {console.log('추가 로딩 안됨')};
+    let writeIdxedDB = async (names:any[]) => {console.log('추가 로딩 안됨')};
     let deleteIdxedDBValue = (key:number) => {console.log('삭제 로딩 안됨')};
-    let clearIdxedDBValue = () => {console.log('초기화 로딩 안됨')};
+    let clearIdxedDBValue = async () => {console.log('초기화 로딩 안됨')};
     let getIdxedDBValue = async (key:number) => {console.log('초기화 로딩 안됨')};
     let getIdxedDBFirstValue = async () => {console.log('첫번째 로딩 안됨')};
     let getIdxedDBLength = async () => {console.log('길이 로딩 안됨');return 0};
@@ -23,6 +23,32 @@
 
     const DBName = "list";
 
+    const update = async () => {
+        const length = await getLength();
+        const preLength = (lists.length)? lists[0].id: -1;
+        const fir = await first();
+        if (length > preLength) {
+            for (let i = preLength + fir.id + 1; i < length + fir.id; i++) {
+                let res = await find(i);
+                lists = [res, ...lists];
+            }
+            can = !(lists.length >= length);
+        }
+    }
+    const reload = async () => {
+        lists = [];
+        const leng = await getLength();
+        if (!lists.length && leng) {
+            const fir = await first();
+            const last = fir.id + leng - 1;
+            for (let i = last; i > Math.max(last - 10, fir.id - 1); i--) {
+                let now = await find(i);
+                lists = [...lists, now];
+            }
+            can = !(last - 10 <= fir.id - 1);
+        }
+    }
+
     onMount(async () => {
         const idxedDB = window.indexedDB;
         if (!idxedDB) window.alert('해당 브라우저에서는 indexedDB를 지원하지 않습니다.')
@@ -35,9 +61,9 @@
                 db = e.target.result;
                 let objectStore = db.createObjectStore(DBName, { keyPath: "id" });
             }}
-        writeIdxedDB = (names:any[]) => {
+        writeIdxedDB = async (names:any[]) => {
             const request = window.indexedDB.open('SampleDB');
-            request.onsuccess =(e)=> {
+            request.onsuccess = async (e) => {
                 const db = request.result;
                 const transaction = db.transaction([DBName], 'readwrite');  
                 //person 객체 저장소에 읽기&쓰기 권한으로 transaction 생성
@@ -55,7 +81,9 @@
                 const objStore = transaction.objectStore(DBName);
                 for (const name of names) {
                     const request = objStore.add(name);   // 저장
-                }  
+                }
+
+                await update();
             }}
         deleteIdxedDBValue = (key:number) => {
             const request = window.indexedDB.open('SampleDB');     // 1. db 열기
@@ -72,10 +100,10 @@
                 const objStore = transaction.objectStore(DBName);   // 2. name 저장소 접근
                 const objStoreRequest = objStore.delete(key);       // 3. 삭제하기
             }}
-        clearIdxedDBValue = () => {
+        clearIdxedDBValue = async () => {
             const request = window.indexedDB.open('SampleDB');     // 1. db 열기
 
-            request.onsuccess =(e)=> {
+            request.onsuccess = async (e) => {
                 const db = request.result;
                 const transaction = db.transaction(DBName, 'readwrite');
                 transaction.onerror =(e)=> {
@@ -89,6 +117,8 @@
                 objStoreRequest.onsuccess =(e)=> {
                     console.log('초기화됨.');
                 }
+
+                await reload();
             }}
         getIdxedDBValue = async (key:number) => {
             const request = window.indexedDB.open('SampleDB');  // 1. DB 열기
@@ -196,11 +226,14 @@
             </defs>
             </svg>
         </button>
-        <h1 on:click={async () => {add([{id: await getLength(), name: 'dsfasdf'}])}}>모션인식 건강관리 프로그램 (클릭하면 값추가)</h1>
+        <h1>모션인식 건강관리 프로그램</h1>
+        <button style="margin: 5px;" on:click={async () => {await add([{id: await getLength(), name: 'dsfasdf'}])}}>값 1개 추가</button>
+        <button style="margin: 5px;" on:click={async () => {await clear()}}>모두 삭제</button>
     </header>
     <div class="side {sidebar? 'on':''}">
         <div class="up">
             <div class="listname">기록</div>
+            <div class="reload" on:click={async () => {await reload()}}>refresh</div>
             <button class="pan" on:click={() => {sidebar = false}}>
                 <svg width="50" height="50" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_53997_17377)">
@@ -218,8 +251,8 @@
             {#each lists as {id, name}, i}
             <div class="list">
                 <div class="listTitle">{i + 1}. {id}번째 {name}</div>
-                <!-- <div class="listTime">0월 0일 0:00</div> -->
-                <div class="listTime">{new Date(Date.now()).toISOString()}</div>
+                <div class="listTime">0월 0일 0:00</div>
+                <!-- <div class="listTime">{new Date(Date.now()).toISOString()}</div> -->
             </div>
             {/each}
             {#if can && lists.length}
@@ -347,6 +380,7 @@
         margin: 20px;
         color: #CAC4D0;
         font-weight: 800;
+        margin-right: 0px;
     }
     .list > div {
         width: 300px;
@@ -396,10 +430,6 @@
         font-size: 19px;
         margin: 20px;
     }
-    *::selection {
-        background-color: #D0BCFF;
-        color: #381E72;
-    }
     .nothing {
         color: #E6E0E9;
         font-size: 18px;
@@ -417,5 +447,19 @@
         z-index: 1;
         background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(0,0,0,1) 100%);
         pointer-events: none;
+    }
+    .reload {
+        font-family: "Material Symbols Outlined";
+        font-size: 23px;
+        font-weight: 500;
+        text-align: center;
+        color: #CAC4D0;
+        margin: 4px;
+        transition: 200ms;
+        user-select: none;
+    }
+    .reload:hover {
+        cursor: pointer;
+        transform: scale(110%, 110%) rotate(180deg);
     }
 </style>
