@@ -278,7 +278,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="list" on:click={() => {pop({id, name, time})}}>
                 <div class="listTitle">{i + 1}. {id}번째 {name}</div>
-                <div class="listTime"><div>{time[1] + 1}월 {time[2]}일 {time[3]}:{time[4]}:{time[5]}</div>
+                <div class="listTime"><div>{time[1] + 1}월 {time[2]}일 {time[3]}:{time[4]}</div>
                 <div class="infoBut">info</div></div>
                 <!-- <div class="listTime">{new Date(Date.now()).toISOString()}</div> -->
             </div>
