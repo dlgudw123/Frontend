@@ -226,6 +226,7 @@
             </defs>
             </svg>
         </button>
+        <a href="/" class="home">home</a>
         <h1>모션인식 건강관리 프로그램</h1>
         <button style="margin: 5px;" on:click={async () => {await add([{id: await getLength(), name: 'dsfasdf'}])}}>값 1개 추가</button>
         <button style="margin: 5px;" on:click={async () => {await clear()}}>모두 삭제</button>
@@ -461,5 +462,18 @@
     .reload:hover {
         cursor: pointer;
         transform: scale(110%, 110%) rotate(180deg);
+    }
+    .home {
+        font-family: "Material Symbols Outlined";
+        font-size: 28px;
+        color: #E6E0E9;
+        margin: 3px;
+        user-select: none;
+        transition: 200ms;
+        text-decoration: none;
+    }
+    .home:hover {
+        cursor: pointer;
+        transform: scale(110%, 110%);
     }
 </style>
