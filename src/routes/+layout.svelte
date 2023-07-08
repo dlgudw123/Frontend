@@ -3,6 +3,7 @@
     
     let load = false;
     let sidebar = false;
+    let popup = false;
     
     let writeIdxedDB = async (names:any[]) => {console.log('추가 로딩 안됨')};
     let deleteIdxedDBValue = (key:number) => {console.log('삭제 로딩 안됨')};
@@ -21,6 +22,12 @@
     let lists:{id:number, name:string, time:number[]}[] = [];
     let can = true;
     let yoil = ['일', '월', '화', '수', '목', '금', '토'];
+    let focusinfo:{id:number, name:string, time:number[]};
+
+    const pop = (focus:{id:number, name:string, time:number[]}) => {
+        focusinfo = focus;
+        popup = true;
+    }
 
     const DBName = "list";
 
@@ -219,6 +226,18 @@
 </script>
 
 <main class="bc2" style="{(load)? '':'display: none;'}">
+    <div class="pop {popup? '':'no'}">
+        <div class="popup" style="z-index: 2;">
+            {#if focusinfo}
+            <div class="popupup">
+                <div class="popuptitle">{focusinfo.id}번째 {focusinfo.name}</div>
+                <div class="popupclose" on:click={() => {popup = false}}><div class="closein">close</div></div>
+            </div>
+            <div class="popupdown">{focusinfo.time[0]}년 {focusinfo.time[1] + 1}월 {focusinfo.time[2]}일 {yoil[focusinfo.time[7]]}요일 {focusinfo.time[3]}시 {focusinfo.time[4]}분 {focusinfo.time[5]}.{focusinfo.time[6]}초</div>
+            {/if}
+        </div>
+        <div style="width: 100vw; height: 100vh; position: absolute;" on:click={() => {popup = false}}></div>
+    </div>
     <header class="bc3">
         <button class="pan" on:click={() => {sidebar = true}}>
             <svg width="50" height="50" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -256,9 +275,11 @@
         </div>
         <div class="lists">
             {#each lists as {id, name, time}, i}
-            <div class="list">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <div class="list" on:click={() => {pop({id, name, time})}}>
                 <div class="listTitle">{i + 1}. {id}번째 {name}</div>
-                <div class="listTime">{time[1] + 1}월 {time[2]}일 {time[3]}:{time[4]}:{time[5]}</div>
+                <div class="listTime"><div>{time[1] + 1}월 {time[2]}일 {time[3]}:{time[4]}:{time[5]}</div>
+                <div class="infoBut">info</div></div>
                 <!-- <div class="listTime">{new Date(Date.now()).toISOString()}</div> -->
             </div>
             {/each}
@@ -405,10 +426,13 @@
         color: #E6E0E9;
         font-weight: 600;
     }
-    .listTime {
+    div.listTime {
         font-size: 16px;
         color: #CAC4D0;
         font-weight: 300;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
     }
     .graph {
         position: fixed;
@@ -481,5 +505,79 @@
     .home:hover {
         cursor: pointer;
         transform: scale(110%, 110%);
+    }
+    .infoBut {
+        font-family: "Material Symbols Outlined";
+        font-size: 18px;
+        user-select: none;
+        margin: 0;
+        width: min-content;
+        height: min-content;
+        text-align: center;
+        margin-left: 3px;
+        font-weight: 400;
+    }
+    .pop {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: 200ms;
+    }
+    .pop.no {
+        pointer-events: none;
+        user-select: none;
+        opacity: 0%;
+    }
+    .popup {
+        width: 30vw;
+        height: 45vh;
+        background-color: #1D1B20;
+        border: 4px solid #DFD5EC;
+        border-radius: 20px;
+        padding: 30px;
+        color: #DFD5EC;
+        transition: 300ms cubic-bezier(.36,.01,0,1);
+    }
+    .pop.no > .popup {
+        transform: scale(95%, 95%);
+        opacity: 0%;
+    }
+    .popupup {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    .popuptitle {
+        font-size: 40px;
+        font-weight: 700;
+        width: calc(100% - 60px);
+    }
+    .popupclose {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 200ms;
+        border-radius: 50%;
+    }
+    .popupclose:hover {
+        background-color: rgba(208, 188, 255, 0.12);
+        cursor: pointer;
+    }
+    .closein {
+        font-family: "Material Symbols Outlined";
+        font-size: 30px;
+        user-select: none;
+    }
+    .popupdown {
+        margin-top: 5px;
+        width: 100%;
+        font-size: 23px;
     }
 </style>
