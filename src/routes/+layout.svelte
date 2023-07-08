@@ -18,8 +18,9 @@
     const first = () => getIdxedDBFirstValue();
     const getLength = () => getIdxedDBLength();
 
-    let lists:{id:number, name:string}[] = [];
+    let lists:{id:number, name:string, time:number[]}[] = [];
     let can = true;
+    let yoil = ['일', '월', '화', '수', '목', '금', '토'];
 
     const DBName = "list";
 
@@ -191,12 +192,17 @@
         console.log(leng);
         if (!lists.length && leng) {
             const fir = await first();
-            const last = fir.id + leng - 1;
-            for (let i = last; i > Math.max(last - 10, fir.id - 1); i--) {
-                let now = await find(i);
-                lists = [...lists, now];
+            if (fir.time) {
+                const last = fir.id + leng - 1;
+                for (let i = last; i > Math.max(last - 10, fir.id - 1); i--) {
+                    let now = await find(i);
+                    lists = [...lists, now];
+                }
+                can = !(last - 10 <= fir.id - 1);
             }
-            can = !(last - 10 <= fir.id - 1);
+            else {
+                clear();
+            }
         }
         load = true;
     });
@@ -228,7 +234,7 @@
         </button>
         <a href="/" class="home">home</a>
         <h1>모션인식 건강관리 프로그램</h1>
-        <button style="margin: 5px;" on:click={async () => {await add([{id: await getLength(), name: 'dsfasdf'}])}}>값 1개 추가</button>
+        <button style="margin: 5px;" on:click={async () => {const time = new Date(); await add([{id: await getLength(), name: 'dsfasdf', time: [time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds(), time.getDay()]}])}}>값 1개 추가</button>
         <button style="margin: 5px;" on:click={async () => {await clear()}}>모두 삭제</button>
     </header>
     <div class="side {sidebar? 'on':''}">
@@ -249,10 +255,10 @@
             </button>
         </div>
         <div class="lists">
-            {#each lists as {id, name}, i}
+            {#each lists as {id, name, time}, i}
             <div class="list">
                 <div class="listTitle">{i + 1}. {id}번째 {name}</div>
-                <div class="listTime">0월 0일 0:00</div>
+                <div class="listTime">{time[1] + 1}월 {time[2]}일 {time[3]}:{time[4]}:{time[5]}</div>
                 <!-- <div class="listTime">{new Date(Date.now()).toISOString()}</div> -->
             </div>
             {/each}
