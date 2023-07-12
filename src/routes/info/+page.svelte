@@ -7,10 +7,10 @@
 
 <main>
     <div class="date {(sel + 1)? 'yes':''}">
-        <div class="title"><input type="text" class="inp">{year}년 {month}월{(sel + 1)? ` ${sel + 1}일 ${yoil[new Date(year,month,sel).getDay()]}요일`:''}</div>
-        <div class="bin" style="width: {new Date(year,month,0).getDay() * 92}px;"></div>
+        <div class="title">{year}년 {month}월{(sel)? ` ${sel}일 ${yoil[new Date(year,month - 1,sel).getDay()]}요일`:''}</div>
+        <div class="bin" style="width: {new Date(year,month - 1,1).getDay() * 92}px;"></div>
         {#each Array(new Date(year,month,0).getDate()) as v, i}
-        <label><div>{i + 1}</div><input type="radio" name="date" value="{i}" on:input={() => {sel = i}}></label>
+        <label><div>{i + 1}</div><input type="radio" name="date" value="{i + 1}" on:input={() => {sel = i + 1}}></label>
         {/each}
     </div>
 </main>
@@ -67,16 +67,6 @@
         color: #DFD5EC;
         font-size: 50px;
         width: 100%;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .inp {
-        color: #DFD5EC;
-        font-size: 50px;
-        background-color: #00000000;
-        border: 0;
-        width: 100px;
         font-weight: 700;
         text-align: center;
         margin-bottom: 20px;
